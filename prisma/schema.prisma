@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  studentId    String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  votes        Vote[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  locationLat Float
+  locationLng Float
+  createdBy   Int
+  candidates  Candidate[]
+  votes       Vote[]
+}
+
+model Candidate {
+  id        Int    @id @default(autoincrement())
+  eventId   Int
+  name      String
+  photoUrl  String?
+  event     Event  @relation(fields: [eventId], references: [id])
+  votes     Vote[]
+}
+
+model Vote {
+  id          Int      @id @default(autoincrement())
+  eventId     Int
+  userId      Int
+  candidateId Int
+  selfieUrl   String?
+  gpsLat      Float
+  gpsLng      Float
+  createdAt   DateTime @default(now())
+  event       Event    @relation(fields: [eventId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+
+  @@unique([eventId, userId]) // one-vote-per-user per event
+}
+
