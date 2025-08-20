@@ -15,3 +15,5 @@ Aplikasi **E-Voting** untuk event kampus dengan fitur keamanan berbasis **GPS** 
 
 ---
 
+Npm run dev to start server
+
